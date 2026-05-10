@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-slate-50" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WaterOps Dashboard</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="global-typography">
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+<style data-purpose="custom-layout">
+    /* Custom scrollbar for better UI feel */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .status-glow {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col">
+<!-- BEGIN: Top Header -->
+<header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-20" data-purpose="main-header">
+<div class="flex items-center space-x-2">
+<!-- Logo Placeholder -->
+<div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+</svg>
+</div>
+<span class="text-xl font-bold text-slate-800 tracking-tight">WaterOps</span>
+</div>
+<div class="hidden md:flex items-center text-sm font-medium text-slate-500">
+<span>System Status:</span>
+<span class="text-green-500 ml-1">Online, All Systems Normal</span>
+</div>
+<div class="flex items-center space-x-6">
+<div class="text-sm text-slate-500 font-medium">
+        October 26, 2023, 14:35 PM
+      </div>
+<div class="flex items-center space-x-2 border-l pl-6 border-slate-200">
+<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="text-sm font-semibold text-slate-700">Admin User</span>
+<button class="text-slate-400 hover:text-slate-600">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" fill-rule="evenodd"></path>
+</svg>
+</button>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-slate-50 border-r border-slate-200 overflow-y-auto hidden lg:block" data-purpose="sidebar-navigation">
+<nav class="p-4 space-y-2"><a class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-100 text-blue-700 font-medium shadow-sm transition-colors" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+<path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+</svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors font-normal" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
+</svg>
+<span>Tanks</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors font-normal" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" fill-rule="evenodd"></path>
+</svg>
+<span>Motors</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors font-normal" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+</svg>
+<span>Analytics</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors font-normal" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+</svg>
+<span>Alerts</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors font-normal" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" fill-rule="evenodd"></path>
+</svg>
+<span>Reports</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors font-normal" data-purpose="nav-item" href="#">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" fill-rule="evenodd"></path>
+</svg>
+<span>Settings</span>
+</a></nav>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Dashboard Content -->
+<main class="flex-1 overflow-y-auto p-6" data-purpose="main-dashboard-grid">
+<div class="max-w-[1400px] mx-auto space-y-6">
+<!-- BEGIN: Metrics Top Row -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" data-purpose="metrics-row">
+<!-- Card 1 -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between" style="background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);">
+<div class="flex items-center space-x-3 text-slate-600 font-medium text-sm">
+<div class="p-2 bg-blue-100 rounded-lg text-blue-600">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 2.69l5.66 5.66a8 8 0 1 1-11.31 0L10 2.69z"></path>
+</svg>
+</div>
+<span>Current Level (%)</span>
+</div>
+<div class="mt-4 flex items-end justify-between">
+<span class="text-3xl font-bold text-slate-800">85%</span>
+<span class="text-green-500 flex items-center text-sm font-semibold">
+<svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                +2.4%
+              </span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between" style="background: linear-gradient(135deg, #ffffff 0%, #edfaff 100%);">
+<div class="flex items-center space-x-3 text-slate-600 font-medium text-sm">
+<div class="p-2 bg-sky-100 rounded-lg text-sky-600">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M11 17a1 1 0 001.447.894l5-2.5A1 1 0 0018 14.5V6a1 1 0 00-1.447-.894l-5 2.5A1 1 0 0011 8.5V17zM2.553 14.394l5 2.5a1 1 0 001.447-.894V8.5a1 1 0 00-.553-.894l-5-2.5A1 1 0 002 6v8.5a1 1 0 00.553.894z"></path>
+</svg>
+</div>
+<span>Total Volume (L)</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-bold text-slate-800">4,250,000 L</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between" style="background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);">
+<div class="flex items-center space-x-3 text-slate-600 font-medium text-sm">
+<div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path>
+</svg>
+</div>
+<span>Battery (V)</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-bold text-slate-800">12.8 V</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);">
+<div class="flex items-center space-x-3 text-slate-600 font-medium text-sm">
+<div class="p-2 bg-teal-100 rounded-lg text-teal-600">
+<svg class="h-5 w-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span>Flow Rate</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-bold text-slate-800">1,200 L/min</span>
+</div>
+</div>
+</section>
+<!-- END: Metrics Top Row -->
+<!-- BEGIN: Center Dashboard Content -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6" data-purpose="middle-section">
+<!-- BEGIN: Live Tank Visualization -->
+<section class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100" data-purpose="tank-viz">
+<h3 class="text-lg font-bold text-slate-800 mb-6">Live Tank Visualization</h3>
+<div class="relative flex justify-center items-center h-[400px]">
+<!-- Mock Tank Graphic -->
+<div class="relative w-48 h-80 bg-slate-100 rounded-[40px] border-4 border-slate-300 overflow-hidden shadow-inner">
+<!-- Water Fill -->
+<div class="absolute bottom-0 left-0 right-0 bg-blue-400 bg-opacity-70 transition-all duration-1000" style="height: 85%;">
+<div class="absolute top-0 left-0 right-0 h-4 bg-blue-300 opacity-50 blur-sm -translate-y-2"></div>
+<!-- Water Bubbles/Detail -->
+<div class="absolute inset-0 bg-gradient-to-t from-blue-500 to-transparent"></div>
+</div>
+<!-- Tank Lid -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-24 h-4 bg-slate-400 rounded-full border border-slate-500"></div>
+</div>
+<!-- Scale Indicators -->
+<div class="absolute right-4 h-80 flex flex-col justify-between py-2 text-xs font-bold text-slate-400">
+<span>100%</span>
+<span class="text-blue-600 bg-blue-50 px-1 rounded">85%</span>
+<span>75%</span>
+<span>50%</span>
+<span>25%</span>
+<span>0%</span>
+</div>
+</div>
+</section>
+<!-- END: Live Tank Visualization -->
+<!-- BEGIN: Motor Control and Analytics -->
+<div class="lg:col-span-5 space-y-6 flex flex-col">
+<!-- Motor Control Center -->
+<section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100" data-purpose="motor-controls"><h3 class="text-lg font-bold text-slate-800 mb-6">Motor Control Center</h3>
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center border-4 border-green-100" style="box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);"></div>
+<div>
+<p class="text-sm text-slate-500 font-medium">Status</p>
+<p class="text-xl font-bold text-green-600">Running</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<button class="flex items-center justify-center space-x-2 py-3 px-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow-md">
+<svg class="h-5 w-5 fill-current" viewbox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+<span>START</span>
+</button>
+<button class="flex items-center justify-center space-x-2 py-3 px-4 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-md">
+<svg class="h-5 w-5 fill-current" viewbox="0 0 24 24"><path d="M6 6h12v12H6z"></path></svg>
+<span>STOP</span>
+</button>
+<button class="flex items-center justify-center space-x-2 py-3 px-4 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition shadow-md">
+<svg class="h-5 w-5 fill-current" viewbox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></svg>
+<span>AUTO</span>
+</button>
+</div></section>
+<!-- Analytics Section -->
+<section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex-1" data-purpose="analytics-chart">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Analytics Section</h3>
+<div class="relative">
+<select class="text-xs font-semibold border-slate-200 rounded-lg bg-slate-50 py-1 pl-3 pr-8 focus:ring-blue-500 focus:border-blue-500">
+<option>Oct 26, 2023 - Jan 25, 2023</option>
+</select>
+</div>
+</div>
+<p class="text-sm font-medium text-slate-500 mb-4">Water Level &amp; Consumption Trends - Past 24 Hours</p>
+<!-- Mock Canvas/Chart Area -->
+<div class="h-48 relative border-b border-slate-200 flex items-end ml-10">
+<!-- SVG Chart Mockup -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 100">
+<!-- Water Level Path -->
+<path d="M0 60 Q 50 30, 100 50 T 200 40 T 300 60 T 400 30" fill="none" stroke="#3b82f6" stroke-width="2"></path>
+<!-- Consumption Path -->
+<path d="M0 85 Q 50 80, 100 88 T 200 82 T 300 85 T 400 78" fill="none" stroke="#10b981" stroke-width="2"></path>
+</svg>
+<!-- Chart Legend -->
+<div class="absolute top-0 right-0 flex items-center space-x-4 text-[10px] font-bold uppercase tracking-tight">
+<div class="flex items-center space-x-1">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+<span class="text-slate-500">Water Level</span>
+</div>
+<div class="flex items-center space-x-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-slate-500">Consumption</span>
+</div>
+</div>
+<div class="absolute -left-10 top-0 bottom-0 flex flex-col justify-between items-end text-[10px] font-medium text-slate-500 pb-1 pr-1">
+<span>100%</span>
+<span>75%</span>
+<span>50%</span>
+<span>25%</span>
+<span>0%</span>
+</div>
+<div class="absolute top-[15%] left-[40%] bg-slate-800 text-white text-[10px] p-1.5 rounded shadow-lg z-10 leading-tight">
+<div>Msv 26</div>
+<div class="flex items-center space-x-1 mt-0.5"><span class="w-2 h-2 bg-blue-500 rounded-sm"></span><span>Water Level: 85!</span></div>
+</div>
+<div class="absolute top-[45%] right-[25%] bg-slate-800 text-white text-[10px] p-1.5 rounded shadow-lg z-10 leading-tight">
+<div>Mar 15</div>
+<div class="flex items-center space-x-1 mt-0.5"><span class="w-2 h-2 bg-emerald-500 rounded-sm"></span><span>Consumption: 153</span></div>
+</div></div>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-slate-400"><span>02 AM</span>
+<span>03 AM</span>
+<span>06 AM</span>
+<span>09 AM</span>
+<span>1:20 PM</span>
+<span>1:10 PM</span>
+<span>2:00 PM</span>
+<span>2:30 PM</span>
+<span>3:00 PM</span>
+<span>4:00 PM</span>
+<span>5:00 PM</span>
+<span>6:00 PM</span></div>
+</section>
+</div>
+<!-- END: Motor Control and Analytics -->
+<!-- BEGIN: Recent Alerts & Activity -->
+<section class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col" data-purpose="alerts-panel">
+<h3 class="text-lg font-bold text-slate-800 mb-6">Recent Alerts &amp; Activity</h3>
+<div class="space-y-4 flex-1 overflow-y-auto pr-1">
+<!-- Alert: Critical -->
+<div class="p-4 rounded-xl bg-red-50 border border-red-100 flex items-start space-x-3">
+<div class="mt-1 text-red-500">
+<svg class="h-6 w-6" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h4 class="text-sm font-bold text-red-700">CRITICAL: <span class="font-medium">Low Water Level in Tank 2 (15%)</span></h4>
+<p class="text-xs text-red-600 mt-1">14:30 PM</p>
+</div>
+</div>
+<!-- Alert: Warning -->
+<div class="p-4 rounded-xl bg-orange-50 border border-orange-100 flex items-start space-x-3">
+<div class="mt-1 text-orange-500">
+<svg class="h-6 w-6" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h4 class="text-sm font-bold text-orange-700">ALERT: <span class="font-medium">Motor Overheat, Pump 3</span></h4>
+<p class="text-xs text-orange-600 mt-1">13:15 PM</p>
+</div>
+</div>
+<!-- Alert: Success -->
+<div class="p-4 rounded-xl bg-green-50 border border-green-100 flex items-start space-x-3">
+<div class="mt-1 text-green-500">
+<svg class="h-6 w-6" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h4 class="text-sm font-bold text-green-700">SYSTEM: <span class="font-medium">Routine Maintenance Completed</span></h4>
+<p class="text-xs text-green-600 mt-1">11:00 AM</p>
+</div>
+</div>
+<!-- Alert: Info -->
+<div class="p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start space-x-3">
+<div class="mt-1 text-blue-500">
+<svg class="h-6 w-6" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h4 class="text-sm font-bold text-blue-700">INFO: <span class="font-medium">User 'J. Smith' Logged In</span></h4>
+<p class="text-xs text-blue-600 mt-1">09:45 AM</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Recent Alerts & Activity -->
+</div>
+<!-- END: Center Dashboard Content -->
+</div>
+</main>
+<!-- END: Main Dashboard Content -->
+</div>
+</body></html>
