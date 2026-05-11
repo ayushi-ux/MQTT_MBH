@@ -1,0 +1,452 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "user"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "mqtt_app",
+    "model": "tankconfig"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "mqtt_app",
+    "model": "waterreading"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "5uphca6zqbosimqoop0udh4d565r40e8",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyFAKV08eu83kIVdpGpoUtqT8d9tkx70Npn3Zt4i4LaWsDVewkTiKoy4_HYR05PrAeiB9T7LNNd1maI8FHnSJseZ-HU73b-Dgq3s6wE1KEOZFfpEbIkVZB259xk6UoQx--g8dwys0x5t7nHwBAa8s86IzxcT6jiz:1vrUfZ:8bnAUSkwWti3nOnBk9-9K2Icw4J9fF7KOg19fPVG0eU",
+    "expire_date": "2026-03-01T05:27:45.119Z"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "add_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "change_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "delete_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "view_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add tank config",
+    "content_type": [
+      "mqtt_app",
+      "tankconfig"
+    ],
+    "codename": "add_tankconfig"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change tank config",
+    "content_type": [
+      "mqtt_app",
+      "tankconfig"
+    ],
+    "codename": "change_tankconfig"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete tank config",
+    "content_type": [
+      "mqtt_app",
+      "tankconfig"
+    ],
+    "codename": "delete_tankconfig"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view tank config",
+    "content_type": [
+      "mqtt_app",
+      "tankconfig"
+    ],
+    "codename": "view_tankconfig"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add water reading",
+    "content_type": [
+      "mqtt_app",
+      "waterreading"
+    ],
+    "codename": "add_waterreading"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change water reading",
+    "content_type": [
+      "mqtt_app",
+      "waterreading"
+    ],
+    "codename": "change_waterreading"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete water reading",
+    "content_type": [
+      "mqtt_app",
+      "waterreading"
+    ],
+    "codename": "delete_waterreading"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view water reading",
+    "content_type": [
+      "mqtt_app",
+      "waterreading"
+    ],
+    "codename": "view_waterreading"
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$SUviruzQ6r56eThgQVKLdu$xRVmw3IDv4pfXfbQ/4zCmw9dnYHt2AIcZMnwfv80yC4=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "tt",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-15T05:25:08.274Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$DUOwgzPjU9OOyYrxrHJApF$EI8uc4AgQICj04S8kRZjte28f0n5WP4c0Jix3lP4yy0=",
+    "last_login": "2026-02-15T05:27:45.105Z",
+    "is_superuser": true,
+    "username": "t",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-15T05:27:26.039Z",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]
