@@ -1,0 +1,37 @@
+font-semibold text-outline-variant">
+    <div id="sensorDot" class="w-2.5 h-2.5 rounded-full bg-outline"></div>
+    <span id="sensorLabel">Waiting for sensor...</span>
+</div>
+<button onclick="toggleDark()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant/15 hover:bg-outline-variant/30 transition-all text-sm" id="themeBall">🌙</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Chief Operator Profile" class="w-full h-full object-cover" data-alt="professional male profile photo in clean architectural setting with soft dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBTSV4pE6Tei6rcVe4KhZbJ4W96UhkmQVutv-bzvwilejwU7Mqcsxip_aIxoKO41xXHp9iFgTHNKd1IgZQuhg6Xrgh9esWtM_tsNOFQi7U3H21Db8Fboa7d61Tw1P2PvVKW135tm0rpEtNP9ol4MNfxYzdDePRJHUAjGWT8Arkt2Q9NYQvZlme9kRuKUKASmmeUp8KmB6cSru7B01rmXfJD5or_tojohsPv15nPNiyvZ0OiWAclwsTLZQuP7FDDfgSPBmjyPUWxOcL"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col h-full w-64 bg-[#0c0e11] py-8 z-40 border-r border-outline-variant/20 shrink-0">
+<div class="px-6 mb-8 flex flex-col gap-1">
+<div class="w-12 h-12 bg-surface-container-high rounded-xl mb-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">waves</span>
+</div>
+<!-- Device Selection Dropdown -->
+<div class="relative w-full group mt-2">
+<select id="deviceSelector" onchange="changeDevice(this.value)" class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-on-surface font-headline font-bold text-lg appearance-none cursor-pointer hover:border-primary transition-colors focus:outline-none focus:border-primary">
+    <!-- Dynamically loaded -->
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none group-hover:text-primary transition-colors">expand_more</span>
+</div>
+<p class="text-secondary text-[10px] font-semibold uppercase tracking-widest mt-2">Active Flow</p>
+<button class="mt-4 w-full py-2 border border-outline-variant hover:border-primary rounded-lg text-primary text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors" onclick="openModal()">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Add Tank Device
+                </button>
+</div>
+<nav class="flex-grow">
+<ul class="space-y-1">
+<li class="bg-[#0077c1] text-white rounded-r-full mr-4 px-6 py-3 flex items-center gap-4 cursor-pointer transition-all" onclick="switchTab('dashboard')">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-headline uppercase text-xs font-semibold">Overview</span>
+</li>
+<li class="text-[#e2e2e6] hover:text-[#9ccaff] hover:bg-[#282a2d] px-6 py-3 flex items-center gap-4 cursor-pointer transition-all rounded-r-full mr-4" onclick="switchTab('config'

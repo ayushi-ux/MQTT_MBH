@@ -11,6 +11,10 @@ from .views import (
     get_logs,
     export_csv,
     get_live_history,
+    register_device,
+    list_devices,
+    get_json_keys,
+    send_wifi_credentials,
 )
 
 urlpatterns = [
@@ -29,4 +33,10 @@ urlpatterns = [
     path("api/logs/", get_logs),
     path("api/export-csv/", export_csv),
     path("api/live-history/", get_live_history),
+
+    # ✅ NEW — Device registration
+    path("api/register-device/", register_device),
+    path("api/list-devices/", list_devices),
+    path("api/json-keys/", get_json_keys),
+    path("api/send-wifi/", send_wifi_credentials),
 ]

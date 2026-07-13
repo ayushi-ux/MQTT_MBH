@@ -1,0 +1,31 @@
+180: </li>
+181: </ul>
+182: </nav>
+183: <div class="mt-auto px-6 space-y-4">
+184: <div class="flex items-center gap-4 text-[#e2e2e6] hover:text-[#9ccaff] cursor-pointer font-headline uppercase text-xs font-semibold">
+185: <span class="material-symbols-outlined">help</span>
+186: <span>Support</span>
+187: </div>
+188: </div>
+189: </aside>
+190: <!-- Main Content Area -->
+191: <main class="flex-1 overflow-y-auto bg-[#111316] p-6 lg:p-8">
+192: <!-- Header Metrics -->
+193: <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+194: <div>
+195: <h1 class="text-4xl font-headline font-bold tracking-tight text-on-surface uppercase">HydroFlow Dashboard</h1>
+196: <p class="text-outline text-sm mt-1" id="activeDeviceMacDisplay">Select or claim a device to start tracking</p>
+197: </div>
+198: <div class="glass-overlay p-4 rounded-xl flex items-center gap-6 border border-outline-variant/15">
+199: <div class="flex flex-col">
+200: <span class="text-[10px] text-outline font-semibold uppercase tracking-widest">System Alerts</span>
+201: <div class="flex items-center gap-2 mt-1">
+202: <span id="alertBadge" class="status-pill text-xs font-bold uppercase py-0.5 px-2 rounded hidden" style="background: var(--danger); color: white;">CRITICAL</span>
+203: <span id="noAlertText" class="text-secondary font-headline text-sm font-bold uppercase">Normal</span>
+204: </div>
+205: </div>
+206: </div>
+207: </div>
+208: <!-- Tab: Dashboard -->
+209: <div class="tab-content active" id="tab-dashboard">
+210: <div class="grid grid-cols-1 md:grid-cols-12 gap-6">

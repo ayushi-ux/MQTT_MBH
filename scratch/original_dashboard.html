@@ -1,0 +1,1936 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="{% static 'manifest.json' %}">
+<meta name="theme-color" content="#0284c7">
+<title>Water Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Real-time water tank monitoring dashboard with MQTT sensor data, motor control, and historical analytics.">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
+
+<style>
+/* =====================================================
+   GLOBAL THEME VARIABLES
+===================================================== */
+:root {
+    --bg: #f8fafc;
+    --bg-accent: radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 40%),
+                 radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.05), transparent 40%),
+                 #f8fafc;
+    --card: #ffffff;
+    --card-hover: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --primary: #2563eb;
+    --primary-soft: #dbeafe;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --accent: #8b5cf6;
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body.dark {
+    --bg: #0f172a;
+    --bg-accent: radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 40%),
+                 radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.1), transparent 40%),
+                 #020617;
+    --card: #1e293b;
+    --card-hover: #334155;
+    --border: #334155;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-soft: rgba(59, 130, 246, 0.2);
+    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* =====================================================
+   RESET
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", system-ui, Arial, sans-serif;
+    background: var(--bg-accent);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
+
+input {
+    outline: none;
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+.container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px 20px 36px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.9fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.main-column,
+.side-column {
+    display: grid;
+    gap: 20px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.theme-switch {
+    position: relative;
+    width: 64px;
+    height: 32px;
+    background: var(--border);
+    border-radius: 99px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-switch .switch-ball {
+    position: absolute;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 2;
+}
+
+.theme-switch .switch-icons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+    font-size: 12px;
+    opacity: 0.5;
+}
+
+body.dark .theme-switch {
+    background: var(--primary);
+}
+
+body.dark .theme-switch .switch-ball {
+    transform: translateX(32px);
+}
+
+
+.section-block {
+    display: grid;
+    gap: 14px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    padding-left: 4px;
+}
+
+.section-title::before {
+    content: "";
+    width: 34px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes statusBlink {
+    50% { opacity: 0.6; }
+}
+
+@keyframes alertFlash {
+    0% { background: var(--danger); }
+    50% { background: #b91c1c; }
+    100% { background: var(--danger); }
+}
+
+.card {
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+
+
+/* =====================================================
+   HERO
+===================================================== */
+.header {
+    padding: 28px 30px;
+    margin-bottom: 20px;
+    display: grid;
+    gap: 20px;
+    background:
+        radial-gradient(circle at right top, rgba(2,132,199,0.14), transparent 35%),
+        radial-gradient(circle at left center, rgba(14,165,233,0.10), transparent 36%),
+        var(--card);
+}
+
+.header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.header-copy {
+    max-width: 760px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+body.dark .hero-badge {
+    color: #7dd3fc;
+}
+
+.header h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+
+.header p {
+    max-width: 720px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.header-side {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.status-cluster {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.48);
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+}
+
+body.dark .status-pill {
+    background: rgba(15,23,42,0.68);
+}
+
+.status-pill.muted {
+    color: var(--muted);
+}
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.header-stat {
+    background: rgba(255,255,255,0.48);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+body.dark .header-stat {
+    background: rgba(15,23,42,0.62);
+}
+
+.header-stat span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.header-stat strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.header-stat small {
+    display: block;
+    margin-top: 6px;
+    color: var(--subtle);
+    font-size: 12px;
+}
+
+/* =====================================================
+   THEME TOGGLE
+===================================================== */
+.theme-toggle {
+    width: 72px;
+    height: 38px;
+    position: relative;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(226,232,240,0.9));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), var(--shadow-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+body.dark .theme-toggle {
+    background: linear-gradient(135deg, #1e293b, #334155);
+}
+
+.theme-toggle span {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+.theme-toggle span:first-child {
+    left: 11px;
+}
+
+.theme-toggle span:last-child {
+    right: 11px;
+}
+
+.toggle-ball {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 6px 16px rgba(15,23,42,0.18);
+}
+
+body.dark .toggle-ball {
+    transform: translateX(31px);
+    background: #e2e8f0;
+}
+
+/* =====================================================
+   PANELS
+===================================================== */
+.panel {
+    padding: 24px;
+}
+
+.panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.panel-head h2 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-top: 4px;
+}
+
+.panel-kicker {
+    font-size: 11px;
+    color: var(--primary-strong);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 800;
+}
+
+body.dark .panel-kicker {
+    color: #7dd3fc;
+}
+
+.panel-meta {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--card-soft);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =====================================================
+   FORM + DATA BOXES
+===================================================== */
+.input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--card-soft);
+    color: var(--text);
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+input::placeholder {
+    color: var(--subtle);
+}
+
+input:focus {
+    border-color: rgba(2,132,199,0.4);
+    box-shadow: 0 0 0 4px rgba(2,132,199,0.08);
+}
+
+button {
+    padding: 13px 18px;
+    border-radius: 16px;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button.active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.4);
+}
+
+.btn-on {
+    background: var(--success);
+    color: white;
+    box-shadow: 0 12px 24px -6px rgba(16, 185, 129, 0.4);
+}
+
+.btn-off {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 12px 24px -6px rgba(239, 68, 68, 0.4);
+}
+
+.btn-auto {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 12px 24px -6px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary:hover, .btn-on:hover, .btn-off:hover, .btn-auto:hover {
+    opacity: 0.9;
+    box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.2);
+}
+
+
+.btn-on.active {
+    box-shadow: 0 0 0 4px rgba(34,197,94,0.16), 0 16px 28px rgba(34,197,94,0.28);
+}
+
+.btn-off.active {
+    box-shadow: 0 0 0 4px rgba(239,68,68,0.16), 0 16px 28px rgba(239,68,68,0.26);
+}
+
+.btn-auto.active {
+    box-shadow: 0 0 0 4px rgba(148,163,184,0.18), 0 16px 28px rgba(100,116,139,0.28);
+}
+
+.data-grid-compact,
+.info-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.data-grid-compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.data-box {
+    background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248,250,252,0.82));
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+body.dark .data-box {
+    background: linear-gradient(180deg, rgba(15,23,42,0.82), rgba(17,28,49,0.92));
+}
+
+.data-box:hover {
+    transform: translateY(-2px);
+    border-color: rgba(2,132,199,0.20);
+}
+
+.data-box span {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.data-box div {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+}
+
+.data-box small {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--subtle);
+}
+
+/* =====================================================
+   WATER PANEL
+===================================================== */
+.water-section {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+}
+
+.tank-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =====================================================
+   LIQUID TANK ANIMATION
+===================================================== */
+/* =====================================================
+   ADVANCED TANK EFFECTS (Bubbles, Shine, Stream)
+===================================================== */
+.tank {
+    width: 140px;
+    height: 240px;
+    background: var(--bg);
+    border: 4px solid var(--border);
+    border-radius: 40px 40px 12px 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 8px 20px rgba(0,0,0,0.05), var(--shadow);
+}
+
+.liquid {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%; /* Dynamic */
+    background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+    transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wave-container {
+    position: absolute;
+    top: -285px; 
+    left: -50%;
+    width: 200%;
+    height: 300px;
+    background: var(--bg);
+    border-radius: 40%;
+    animation: wave-rotate 8s infinite linear;
+    z-index: 5;
+}
+
+@keyframes wave-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.water-text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+/* Glass Shine Effect */
+.tank::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
+    pointer-events: none;
+    z-index: 15;
+}
+
+/* Inlet Stream (Only visible when motor-on) */
+.inlet-stream {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 0;
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 0 0 4px 4px;
+    z-index: 4;
+    transition: height 0.5s ease;
+    opacity: 0;
+}
+
+.tank.motor-on .inlet-stream {
+    height: 100px;
+    opacity: 1;
+    animation: stream-wiggle 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes stream-wiggle {
+    from { transform: translateX(-50%) scaleX(1); }
+    to { transform: translateX(-50%) scaleX(1.2); }
+}
+
+/* Bubbles (Only visible when motor-on) */
+.bubble-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: 2;
+}
+
+.tank.motor-on .bubble-container {
+    opacity: 1;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: float-up 3s infinite ease-in;
+}
+
+@keyframes float-up {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-240px) scale(0.5); opacity: 0; }
+}
+
+/* Active Pulse for Status Cards */
+.pulse-active {
+    animation: soft-pulse 2s infinite;
+}
+
+@keyframes soft-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    50% { box-shadow: 0 0 15px 5px rgba(34, 197, 94, 0.2); }
+}
+
+/* Data Value Jump */
+.data-value {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: inline-block;
+}
+
+.data-value.updated {
+    transform: scale(1.1);
+}
+
+/* =====================================================
+   MOTOR PANEL
+===================================================== */
+.motor-panel .panel-head {
+    margin-bottom: 16px;
+}
+
+.motor-status {
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}
+
+.motor-on { color: var(--success); }
+.motor-off { color: var(--danger); }
+.motor-auto { color: var(--auto); }
+
+.motor-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* =====================================================
+   ALERT
+===================================================== */
+.alert {
+    padding: 15px 18px;
+    border-radius: 18px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+    animation: pulse 1.5s infinite;
+}
+
+.alert.low {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid rgba(220,38,38,0.28);
+}
+
+.alert.full {
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid rgba(22,163,74,0.28);
+}
+
+.alert.hidden {
+    display: none;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.01); }
+    100% { transform: scale(1); }
+}
+
+/* =====================================================
+   SENSOR STATUS
+===================================================== */
+.sensor-dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #dc2626;
+    transition: background 0.4s;
+    flex-shrink: 0;
+}
+
+.sensor-dot.live {
+    background: var(--success);
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.2);
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0.55; }
+}
+
+/* =====================================================
+   CHARTS
+===================================================== */
+.time-toggle {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.time-btn, .filter-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.time-btn:hover, .filter-btn:hover {
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.time-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.filter-btn.active {
+    border: 1px solid currentColor;
+}
+
+.filter-btn[data-index="0"].active { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.filter-btn[data-index="1"].active { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.filter-btn[data-index="2"].active { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.chart-card {
+    background: var(--card-soft);
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    min-height: 270px;
+}
+
+.chart-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    border-radius: 20px 20px 0 0;
+}
+
+.chart-card.water::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.chart-card.battery::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.chart-card.distance::before { background: linear-gradient(90deg, #14b8a6, #5eead4); }
+.chart-card.motor::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+.chart-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.chart-title .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.chart-title .dot.blue { background: #3b82f6; }
+.chart-title .dot.amber { background: #f59e0b; }
+.chart-title .dot.teal { background: #14b8a6; }
+.chart-title .dot.purple { background: #8b5cf6; }
+
+.chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 205px;
+    min-height: 205px;
+}
+
+.chart-canvas-wrap canvas {
+    width: 100% !important;
+    height: 205px !important;
+}
+
+/* =====================================================
+   LOGS TABLE
+===================================================== */
+.logs-table-wrap {
+    overflow-x: auto;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card-soft);
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.logs-table thead {
+    background: rgba(2,132,199,0.06);
+}
+
+body.dark .logs-table thead {
+    background: rgba(56,189,248,0.08);
+}
+
+.logs-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border);
+}
+
+.logs-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.logs-table tr:last-child td {
+    border-bottom: none;
+}
+
+.logs-table tr:hover {
+    background: rgba(2,132,199,0.02);
+}
+
+.status-on {
+    color: var(--success);
+    font-weight: 800;
+}
+
+.status-off {
+    color: var(--danger);
+    font-weight: 800;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--subtle);
+    font-style: italic;
+}
+
+.logs-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    gap: 14px;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px 16px;
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: var(--card-soft);
+    color: var(--primary);
+}
+
+.btn-outline:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.btn-export {
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    padding: 10px 18px;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.panel {
+    animation: fadeIn 0.4s ease-out backwards;
+}
+
+.panel:nth-child(2) { animation-delay: 0.1s; }
+.panel:nth-child(3) { animation-delay: 0.2s; }
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    .header-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .header-side {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .water-section {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 1. PROFESSIONAL HEADER -->
+    <header class="card" style="margin-bottom: 24px; padding: 24px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px;">
+        <div>
+            <h1 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em;">Water System Operations</h1>
+            <p id="lastUpdated" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Connecting to telemetry...</p>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <div id="sensorPill" class="status-pill" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--primary-soft); border-radius: 99px; font-size: 13px; font-weight: 600; color: var(--primary);">
+                <span id="sensorDot" class="sensor-dot" style="width: 8px; height: 8px;"></span>
+                <span id="sensorLabel">Sensor Waiting</span>
+            </div>
+            
+            <div class="theme-switch" onclick="toggleDark()" title="Toggle Theme">
+                <div class="switch-icons">
+                    <span>☀️</span>
+                    <span>🌙</span>
+                </div>
+                <div class="switch-ball" id="themeBall">☀️</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. COMMAND CENTER (Top Row) -->
+    <div class="top-row" style="display: grid; grid-template-columns: 1.2fr 1fr 0.8fr; gap: 24px; margin-bottom: 24px;">
+        <!-- TANK VIEW -->
+        <div class="card" style="padding: 24px; border-radius: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: 700;">Live Storage</h3>
+                <span id="alertBadge" class="status-pill" style="font-size: 11px; padding: 4px 10px; display: none;"></span>
+            </div>
+            <div style="display: flex; gap: 24px; align-items: center;">
+                <div id="tankElement" class="tank">
+                    <div class="inlet-stream"></div>
+                    <div class="bubble-container">
+                        <div class="bubble" style="width: 8px; height: 8px; left: 20%; animation-delay: 0s;"></div>
+                        <div class="bubble" style="width: 12px; height: 12px; left: 45%; animation-delay: 1s;"></div>
+                        <div class="bubble" style="width: 6px; height: 6px; left: 70%; animation-delay: 2s;"></div>
+                        <div class="bubble" style="width: 10px; height: 10px; left: 30%; animation-delay: 1.5s;"></div>
+                        <div class="bubble" style="width: 8px; height: 8px; left: 60%; animation-delay: 0.5s;"></div>
+                    </div>
+                    <div id="waterFill" class="liquid">
+                        <div class="wave-container"></div>
+                    </div>
+                    <div id="waterText" class="water-text-overlay">--%</div>
+                </div>
+                <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="data-box">
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Percent</span>
+                        <div id="percentage" style="font-size: 20px; font-weight: 800;">--</div>
+                    </div>
+                    <div class="data-box">
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Volume</span>
+                        <div id="filledVolume" style="font-size: 20px; font-weight: 800;">--</div>
+                    </div>
+                    <div class="data-box">
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Battery</span>
+                        <div id="batteryVoltage" style="font-size: 20px; font-weight: 800;">--</div>
+                    </div>
+                    <div class="data-box">
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Distance</span>
+                        <div id="distanceVal" style="font-size: 20px; font-weight: 800;">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOTOR CONTROL -->
+        <div class="card" style="padding: 24px; border-radius: 20px; background: linear-gradient(135deg, var(--card), var(--bg));">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px;">Motor Control</h3>
+            <div id="motorStatus" class="motor-status" style="margin-bottom: 20px; font-size: 18px;">Checking...</div>
+            <div style="display: grid; gap: 12px;">
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnOn" class="btn-on" style="flex: 1; height: 54px; border-radius: 14px;" onclick="motorOn()">START</button>
+                    <button id="btnOff" class="btn-off" style="flex: 1; height: 54px; border-radius: 14px;" onclick="motorOff()">STOP</button>
+                </div>
+                <button id="btnAuto" class="btn-auto" style="height: 54px; border-radius: 14px;" onclick="motorAuto()">AUTO MODE</button>
+            </div>
+        </div>
+
+        <!-- CONFIGURATION -->
+        <div class="card" style="padding: 24px; border-radius: 20px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px;">System Config</h3>
+            <div style="display: grid; gap: 12px;">
+                <input id="totalHeight" type="number" placeholder="Tank Height (m)" style="height: 48px; border-radius: 12px;">
+                <input id="totalVolume" type="number" placeholder="Tank Volume (L)" style="height: 48px; border-radius: 12px;">
+                <button class="btn-primary" style="height: 48px; border-radius: 12px;" onclick="sendInput()">Update Sensor</button>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 16px; font-size: 12px; color: var(--text-muted);">
+                <div>Height: <span id="storedHeight" style="color: var(--text); font-weight: 700;">--</span>m</div>
+                <div>Volume: <span id="storedVolume" style="color: var(--text); font-weight: 700;">--</span>L</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ADVANCED ANALYTICS (Middle Section) -->
+    <div class="section-block" style="margin-bottom: 24px;">
+        <div class="card" style="padding: 24px; border-radius: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font-size: 18px; font-weight: 800;">System Analytics</h3>
+                
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <div class="chart-filters" style="display: flex; gap: 8px; background: var(--bg); padding: 4px; border-radius: 12px;">
+                        <button class="filter-btn active" data-index="0" onclick="toggleDataset(0, this)">Water</button>
+                        <button class="filter-btn active" data-index="1" onclick="toggleDataset(1, this)">Battery</button>
+                        <button class="filter-btn active" data-index="2" onclick="toggleDataset(2, this)">Motor</button>
+                    </div>
+
+                    <div class="time-toggle">
+                        <button class="time-btn active" data-hours="1" onclick="switchTimeRange(this)">1H</button>
+                        <button class="time-btn" data-hours="6" onclick="switchTimeRange(this)">6H</button>
+                        <button class="time-btn" data-hours="24" onclick="switchTimeRange(this)">24H</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 600px;">
+                <canvas id="chartMain"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. ACTIVITY LOG (Bottom Section) -->
+    <div class="section-block">
+        <div class="card" style="padding: 24px; border-radius: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 18px; font-weight: 800;">Operational Logs</h3>
+                <button class="btn-export" onclick="exportCSV()" style="padding: 8px 16px; border-radius: 10px; font-size: 12px;">⬇ Export Data</button>
+            </div>
+
+            <div class="logs-table-wrap" style="border: none;">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Water %</th>
+                            <th>Volume (L)</th>
+                            <th>Battery</th>
+                            <th>Mode</th>
+                            <th>Motor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody">
+                        <tr><td colspan="6" class="no-data">Initializing logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="logs-actions" style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;">
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnPrevPage" class="btn-outline" onclick="logsPage(-1)" style="border-radius: 8px;">PREV</button>
+                    <button id="btnNextPage" class="btn-outline" onclick="logsPage(1)" style="border-radius: 8px;">NEXT</button>
+                </div>
+                <span id="paginationInfo" style="font-size: 12px; color: var(--text-muted);"></span>
+            </div>
+        </div>
+    </div>
+</div> </div>
+
+</div>
+
+
+<script>
+/* =====================================================
+   THEME
+===================================================== */
+function toggleDark(){
+    document.body.classList.toggle("dark");
+    localStorage.setItem("dark", document.body.classList.contains("dark"));
+    updateChartTheme();
+}
+if(localStorage.getItem("dark")==="true") document.body.classList.add("dark");
+
+
+/* =====================================================
+   SEND INPUT → backend → MQTT → sensor
+===================================================== */
+function sendInput(){
+    const h = document.getElementById("totalHeight").value;
+    const v = document.getElementById("totalVolume").value;
+    if (!h || !v) return;
+
+    fetch("/api/send-input/",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            total_height: +h,
+            total_volume: +v
+        })
+    });
+
+    // Show immediately
+    document.getElementById("storedHeight").innerText = h;
+    document.getElementById("storedVolume").innerText = v;
+}
+
+
+/* =====================================================
+   MOTOR CONTROLS → backend → MQTT → sensor
+   ⚠ THIS LOGIC IS UNCHANGED — CORE FEATURE
+===================================================== */
+let currentMotorMode = 'MANUAL'; // Track current motor mode on frontend
+
+function motorOn(){
+    currentMotorMode = 'MANUAL';
+    fetch("/api/motor-control/",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({status:1})
+    });
+}
+
+function motorOff(){
+    currentMotorMode = 'MANUAL';
+    fetch("/api/motor-control/",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({status:0})
+    });
+}
+
+function motorAuto(){
+    currentMotorMode = 'AUTO'; // Set mode BEFORE any async call
+    fetch("/api/motor-auto/",{method:"POST"});
+}
+
+
+/* =====================================================
+   POLLING – fetch data every 2 seconds
+===================================================== */
+setInterval(async () => {
+
+    /* ---------- INPUT ---------- */
+    try {
+        const input = await (await fetch("/api/input/")).json();
+        const th = input.total_height;
+        const tv = input.total_volume;
+
+        if (th !== undefined && tv !== undefined) {
+            document.getElementById("storedHeight").innerText = th;
+            document.getElementById("storedVolume").innerText = tv;
+        }
+    } catch(e) { console.warn("input poll error", e); }
+
+
+    /* ---------- CALCULATED (sensor-derived) ---------- */
+    try {
+        const calc = await (await fetch("/api/calculated/")).json();
+
+        if (calc.PERCENTAGE !== undefined) {
+            const pct = Number(calc.PERCENTAGE);
+
+            // Update Text Values with Jump Animation
+            const updateVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && el.innerText !== val) {
+                    el.innerText = val;
+                    el.classList.remove('updated');
+                    void el.offsetWidth; // Trigger reflow
+                    el.classList.add('updated');
+                }
+            };
+
+            updateVal("percentage", pct + " %");
+            updateVal("filledVolume", calc.FILLED_WATER_IN_VOLUME);
+            updateVal("distanceVal", calc.DISTANCE + " m");
+            updateVal("batteryVoltage", calc.BATTERY_VOLTAGE + " V");
+
+            // Tank animation
+            const waterFill = document.getElementById("waterFill");
+            const waterText = document.getElementById("waterText");
+            const tankElement = document.getElementById("tankElement");
+            
+            if (waterFill) waterFill.style.height = pct + "%";
+            if (waterText) waterText.innerText = pct + "%";
+            
+            // Toggle Motor-Sync Animations (Bubbles & Stream)
+            if (tankElement) {
+                tankElement.classList.toggle('motor-on', calc.MOTOR_STATUS === 1);
+            }
+
+            const status = document.getElementById("motorStatus");
+            if (status) {
+                status.classList.toggle('pulse-active', calc.MOTOR_STATUS === 1);
+            }
+
+            // Intelligent Sensor Status Indicator
+            const lastUpdate = calc.LAST_UPDATED;
+            const sensorDot = document.getElementById("sensorDot");
+            const sensorLabel = document.getElementById("sensorLabel");
+            const sensorPill = document.getElementById("sensorPill");
+            
+            let isSensorLive = false;
+            if (lastUpdate) {
+                // Parse timestamp (Format: YYYY-MM-DD HH:MM:SS)
+                // We replace " " with "T" to make it ISO-8601 compliant for reliable parsing
+                const lastTime = new Date(lastUpdate.replace(" ", "T"));
+                const now = new Date();
+                
+                // Calculate difference in milliseconds
+                const diffMs = now - lastTime;
+                const diffSeconds = diffMs / 1000;
+                
+                // If data is less than 60 seconds old, consider it live
+                // (60s allows for slight MQTT latency or sensor poll intervals)
+                if (diffSeconds > -30 && diffSeconds < 60) {
+                    isSensorLive = true;
+                }
+            }
+
+            if (isSensorLive) {
+                sensorDot.classList.add("live");
+                sensorLabel.innerText = "Sensor live";
+                if (sensorPill) {
+                    sensorPill.style.background = "var(--primary-soft)";
+                    sensorPill.style.color = "var(--primary)";
+                }
+            } else {
+                sensorDot.classList.remove("live");
+                sensorLabel.innerText = "Waiting for sensor...";
+                if (sensorPill) {
+                    sensorPill.style.background = "var(--border)";
+                    sensorPill.style.color = "var(--text-muted)";
+                }
+            }
+
+            if (lastUpdate) {
+                document.getElementById("lastUpdated").innerText = "Last Heartbeat: " + lastUpdate;
+            } else {
+                document.getElementById("lastUpdated").innerText = "Waiting for data...";
+            }
+
+            /* ---------- ALERTS ---------- */
+            const badge = document.getElementById("alertBadge");
+            if (pct <= 10) {
+                badge.style.display = "inline-block";
+                badge.innerText = "CRITICAL LOW";
+                badge.style.background = "var(--danger)";
+                badge.style.color = "white";
+                badge.style.animation = "alertFlash 1s infinite";
+            }
+            else if (pct >= 95) {
+                badge.style.display = "inline-block";
+                badge.innerText = "TANK FULL";
+                badge.style.background = "var(--success)";
+                badge.style.color = "white";
+                badge.style.animation = "none";
+            }
+            else {
+                badge.style.display = "none";
+            }
+        }
+    } catch(e) { console.warn("calculated poll error", e); }
+
+
+    /* ---------- MOTOR STATE (UNCHANGED LOGIC) ---------- */
+    try {
+        const motor = await (await fetch("/api/motor-state/")).json();
+
+        const btnOn   = document.getElementById("btnOn");
+        const btnOff  = document.getElementById("btnOff");
+        const btnAuto = document.getElementById("btnAuto");
+        const status  = document.getElementById("motorStatus");
+
+        // Sync frontend mode tracker with backend state
+        currentMotorMode = motor.MOTOR_MODE === 1 ? 'MANUAL' : 'AUTO';
+
+        btnOn.classList.remove("active");
+        btnOff.classList.remove("active");
+        btnAuto.classList.remove("active");
+
+        if (motor.MOTOR_MODE === 1) {
+            // MANUAL MODE
+            if (motor.MOTOR_MANUAL_STATUS === 1) {
+                status.innerText = "⚡ MOTOR ON (MANUAL)";
+                status.className = "motor-status motor-on";
+                btnOn.classList.add("active");
+            } else {
+                status.innerText = "⛔ MOTOR OFF (MANUAL)";
+                status.className = "motor-status motor-off";
+                btnOff.classList.add("active");
+            }
+        } else {
+            // AUTO MODE — read status from calc data
+            try {
+                const calc = await (await fetch("/api/calculated/")).json();
+                if (calc.MOTOR_STATUS === 1) {
+                    status.innerText = "⚡ MOTOR ON (AUTO)";
+                    status.className = "motor-status motor-on";
+                } else {
+                    status.innerText = "⛔ MOTOR OFF (AUTO)";
+                    status.className = "motor-status motor-off";
+                }
+            } catch(e) {
+                status.innerText = "AUTO MODE";
+                status.className = "motor-status motor-auto";
+            }
+            btnAuto.classList.add("active");
+        }
+    } catch(e) { console.warn("motor poll error", e); }
+
+}, 2000);
+
+
+/* =====================================================
+   CHART.JS — Time-Series Graphs
+===================================================== */
+
+const isDark = () => document.body.classList.contains("dark");
+
+function chartColors() {
+    return {
+        grid: isDark() ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+        text: isDark() ? "#94a3b8" : "#64748b"
+    };
+}
+
+function baseChartOptions(ylabel) {
+    const c = chartColors();
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 },
+        interaction: {
+            intersect: false,
+            mode: "index"
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: isDark() ? "#1e293b" : "#fff",
+                titleColor: isDark() ? "#e2e8f0" : "#0f172a",
+                bodyColor: isDark() ? "#cbd5e1" : "#475569",
+                borderColor: isDark() ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+                borderWidth: 1,
+                cornerRadius: 10,
+                padding: 10,
+            },
+        },
+        scales: {
+            x: {
+                grid: { color: c.grid, drawBorder: false },
+                ticks: { color: c.text, maxTicksLimit: 10, font: { size: 11 } },
+            },
+            y: {
+                grid: { color: c.grid, drawBorder: false },
+                ticks: { color: c.text, font: { size: 11 } },
+                title: {
+                    display: !!ylabel,
+                    text: ylabel,
+                    color: c.text,
+                    font: { size: 12, weight: "600" }
+                }
+            }
+        }
+    };
+}
+
+function makeGradient(ctx, color1, color2) {
+    const g = ctx.createLinearGradient(0, 0, 0, 200);
+    g.addColorStop(0, color1);
+    g.addColorStop(1, color2);
+    return g;
+}
+
+// Create 1 unified chart
+const ctxMain = document.getElementById("chartMain").getContext("2d");
+
+const chartMain = new Chart(ctxMain, {
+    type: "line",
+    data: {
+        labels: [],
+        datasets: [
+            {
+                label: "Water Level (%)",
+                data: [],
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59,130,246,0.1)",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.5,
+                cubicInterpolationMode: 'monotone',
+                yAxisID: "yWater",
+                pointRadius: 0,
+            },
+            {
+                label: "Battery (V)",
+                data: [],
+                borderColor: "#f59e0b",
+                borderWidth: 2.5,
+                tension: 0.5,
+                cubicInterpolationMode: 'monotone',
+                yAxisID: "yBattery",
+                pointRadius: 0,
+            },
+            {
+                label: "Motor Status",
+                data: [],
+                borderColor: "#8b5cf6",
+                borderWidth: 2,
+                stepped: "before",
+                yAxisID: "yMotor",
+                pointRadius: 0,
+            }
+        ]
+    },
+    options: {
+        ...baseChartOptions(""),
+        scales: {
+            x: baseChartOptions("").scales.x,
+            yWater: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                stack: 'y',
+                stackWeight: 2,
+                min: 0,
+                max: 100,
+                title: { display: true, text: 'Water (%)', color: "#3b82f6" },
+                grid: { color: chartColors().grid },
+                ticks: { color: chartColors().text }
+            },
+            yBattery: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                stack: 'y',
+                stackWeight: 1,
+                min: 3.0,
+                max: 4.5,
+                title: { display: true, text: 'Battery (V)', color: "#f59e0b" },
+                grid: { color: chartColors().grid },
+                ticks: { color: chartColors().text }
+            },
+            yMotor: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                stack: 'y',
+                stackWeight: 0.8,
+                min: -0.1,
+                max: 1.1,
+                title: { display: true, text: 'Motor', color: "#8b5cf6" },
+                grid: { color: chartColors().grid },
+                ticks: {
+                    color: chartColors().text,
+                    stepSize: 1,
+                    callback: (v) => v === 0 ? "OFF" : v === 1 ? "ON" : ""
+                }
+            }
+        }
+    }
+});
+
+const allCharts = [chartMain];
+
+function toggleDataset(index, btn) {
+    const meta = chartMain.getDatasetMeta(index);
+    meta.hidden = meta.hidden === null ? !chartMain.data.datasets[index].hidden : null;
+    
+    if (meta.hidden) {
+        btn.classList.remove("active");
+        btn.style.opacity = "0.4";
+        btn.style.background = "transparent";
+    } else {
+        btn.classList.add("active");
+        btn.style.opacity = "1";
+        // Restore background based on index
+        const colors = ["rgba(59,130,246,0.1)", "rgba(245,158,11,0.1)", "rgba(139,92,246,0.1)"];
+        btn.style.background = colors[index];
+    }
+    chartMain.update();
+}
+
+function updateChartTheme() {
+    allCharts.forEach(ch => {
+        const c = chartColors();
+        chartMain.options.scales.x.grid.color = c.grid;
+        chartMain.options.scales.x.ticks.color = c.text;
+        chartMain.options.scales.yWater.grid.color = c.grid;
+        chartMain.options.scales.yWater.ticks.color = c.text;
+        chartMain.options.scales.yBattery.grid.color = c.grid;
+        chartMain.options.scales.yBattery.ticks.color = c.text;
+        chartMain.options.scales.yMotor.grid.color = c.grid;
+        chartMain.options.scales.yMotor.ticks.color = c.text;
+        
+        ch.options.plugins.tooltip.backgroundColor = isDark() ? "#1e293b" : "#fff";
+        ch.options.plugins.tooltip.titleColor = isDark() ? "#e2e8f0" : "#0f172a";
+        ch.options.plugins.tooltip.bodyColor = isDark() ? "#cbd5e1" : "#475569";
+        ch.options.plugins.tooltip.borderColor = isDark() ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+        ch.update("none");
+    });
+}
+
+
+/* ---- Fetch & render history ---- */
+
+let currentHours = 1;
+let allLogsData = null;       // Stores the full 24h dataset
+let allLiveEntries = [];      // Stores live buffer entries
+
+function switchTimeRange(btn) {
+    document.querySelectorAll(".time-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentHours = parseInt(btn.dataset.hours);
+    renderChartsFromCache(); // Re-filter and render without re-fetching
+}
+
+/**
+ * Filter stored data by the selected hour range and render all 4 charts.
+ */
+function renderChartsFromCache() {
+    if (!allLogsData && allLiveEntries.length === 0) return;
+
+    // Merge DB data and live buffer
+    let mergedLabels = [];
+    let mergedWater = [];
+    let mergedBattery = [];
+    let mergedMotor = [];
+    let mergedTimestamps = []; // full ISO-ish timestamps for filtering
+
+    // Add DB data
+    if (allLogsData) {
+        for (let i = 0; i < allLogsData.labels.length; i++) {
+            mergedLabels.push(allLogsData.labels[i]);
+            mergedWater.push(allLogsData.water_level[i]);
+            mergedBattery.push(allLogsData.battery_voltage[i]);
+            mergedMotor.push(allLogsData.motor_status[i]);
+            mergedTimestamps.push(allLogsData.timestamps ? allLogsData.timestamps[i] : null);
+        }
+    }
+
+    // Add live entries (may overlap with DB data at the tail)
+    const liveEntries = allLiveEntries.entries || [];
+    for (const e of liveEntries) {
+        const parts = e.timestamp.split(" ");
+        const label = parts.length > 1 ? parts[1].substring(0, 5) : e.timestamp;
+        if (mergedLabels.length > 0 && mergedLabels[mergedLabels.length - 1] === label) continue;
+        mergedLabels.push(label);
+        mergedWater.push(e.percentage);
+        mergedBattery.push(e.battery_voltage);
+        mergedMotor.push(e.motor_status);
+        mergedTimestamps.push(e.timestamp.replace(" ", "T")); 
+    }
+
+    // Filter by time range
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - currentHours * 60 * 60 * 1000);
+
+    const filteredLabels = [];
+    const filteredWater = [];
+    const filteredBattery = [];
+    const filteredMotor = [];
+
+    let lastDisplayedBattery = null;
+
+    for (let i = 0; i < mergedLabels.length; i++) {
+        let entryTime = null;
+        if (mergedTimestamps[i]) {
+            entryTime = new Date(mergedTimestamps[i].replace(" ", "T"));
+        }
+        
+        if (!entryTime || isNaN(entryTime.getTime())) {
+            const timeParts = mergedLabels[i].split(":");
+            if (timeParts.length >= 2) {
+                entryTime = new Date();
+                entryTime.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0, 0);
+                if (entryTime > now) entryTime.setDate(entryTime.getDate() - 1);
+            }
+        }
+
+        if (!entryTime || entryTime >= cutoff) {
+            filteredLabels.push(mergedLabels[i]);
+            filteredWater.push(mergedWater[i]);
+            
+            // Battery 0.5V Threshold
+            let batteryVal = mergedBattery[i];
+            if (lastDisplayedBattery === null) {
+                lastDisplayedBattery = batteryVal;
+            } else if (Math.abs(batteryVal - lastDisplayedBattery) >= 0.5) {
+                lastDisplayedBattery = batteryVal;
+            }
+            filteredBattery.push(lastDisplayedBattery);
+            
+            filteredMotor.push(mergedMotor[i]);
+        }
+    }
+
+    // Update the unified chart
+    chartMain.data.labels = filteredLabels;
+    chartMain.data.datasets[0].data = filteredWater;
+    chartMain.data.datasets[1].data = filteredBattery;
+    chartMain.data.datasets[2].data = filteredMotor;
+
+    chartMain.update();
+}
+
+/**
+ * Fetch full 24h history from DB.
+ */
+async function fetchHistory() {
+    try {
+        const res = await fetch("/api/history/?hours=24");
+        allLogsData = await res.json();
+        renderChartsFromCache();
+    } catch(e) { console.warn("History fetch error:", e); }
+}
+
+/**
+ * Fetch live data from the backend's in-memory buffer.
+ */
+async function fetchLiveHistory() {
+    try {
+        const res = await fetch("/api/live-history/");
+        allLiveEntries = await res.json();
+        renderChartsFromCache();
+    } catch(e) { console.warn("Live history fetch error:", e); }
+}
+
+// Initial load + periodic refresh
+fetchHistory();
+fetchLiveHistory();
+setInterval(fetchLiveHistory, 10000);  // Refresh live buffer every 10 seconds
+setInterval(fetchHistory, 60000);       // Refresh DB history every 60 seconds
+
+
+/* =====================================================
+   LOGS TABLE
+===================================================== */
+let currentLogPage = 1;
+
+async function fetchLogs(page) {
+    try {
+        const res = await fetch(`/api/logs/?page=${page}&size=15`);
+        const data = await res.json();
+
+        const tbody = document.getElementById("logsBody");
+
+        if (data.rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="no-data">No logs yet. Data is logged every 5 minutes.</td></tr>';
+            document.getElementById("paginationInfo").innerText = "";
+            document.getElementById("btnPrevPage").disabled = true;
+            document.getElementById("btnNextPage").disabled = true;
+            return;
+        }
+
+        tbody.innerHTML = data.rows.map(r => `
+            <tr>
+                <td>${r.timestamp}</td>
+                <td>${r.percentage}%</td>
+                <td>${r.filled_volume} L</td>
+                <td>${r.distance} m</td>
+                <td>${r.battery_voltage} V</td>
+                <td>${r.motor_mode}</td>
+                <td class="${r.motor_status === 'ON' ? 'status-on' : 'status-off'}">${r.motor_status}</td>
+            </tr>
+        `).join("");
+
+        currentLogPage = data.page;
+        document.getElementById("paginationInfo").innerText =
+            `Page ${data.page} of ${data.total_pages} (${data.total} entries)`;
+        document.getElementById("btnPrevPage").disabled = (data.page <= 1);
+        document.getElementById("btnNextPage").disabled = (data.page >= data.total_pages);
+
+    } catch(e) {
+        console.warn("Logs fetch error:", e);
+    }
+}
+
+function logsPage(delta) {
+    fetchLogs(currentLogPage + delta);
+}
+
+function exportCSV() {
+    window.location.href = "/api/export-csv/";
+}
+
+// Initial load + auto-refresh every 60 seconds
+fetchLogs(1);
+setInterval(() => fetchLogs(currentLogPage), 60000);
+
+
+    function toggleDark() {
+        const body = document.body;
+        const isDark = body.classList.toggle("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+        
+        // Update toggle icon
+        const ball = document.getElementById("themeBall");
+        if (ball) ball.innerText = isDark ? "🌙" : "☀️";
+
+        updateChartTheme();
+    }
+
+    // Initialize theme
+    (function initTheme() {
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+            const ball = document.getElementById("themeBall");
+            if (ball) ball.innerText = "🌙";
+        }
+    })();
+
+
+/* =====================================================
+   SERVICE WORKER (PWA)
+===================================================== */
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("{% static 'sw.js' %}")
+            .then(() => console.log("Service Worker Registered"))
+            .catch(err => console.error("SW Error", err));
+    });
+}
+
+</script>
+
+
+<audio id="buzzerLow" loop>
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<audio id="buzzerFull">
+    <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" type="audio/ogg">
+</audio>
+
+</body>
+</html>

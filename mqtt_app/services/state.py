@@ -1,20 +1,33 @@
 import time
 from collections import deque
 
-LATEST_INPUT = {}
-LATEST_SENSOR = {}
-LATEST_CALCULATED = {}
+DEVICES_STATE = {}
 
-MOTOR_STATE = {
-    "MOTOR_MODE": 0,           # 0 = AUTO, 1 = MANUAL
-    "MOTOR_MANUAL_STATUS": 0,  # valid only in MANUAL
-}
+def get_default_mac():
+    try:
+        from mqtt_app.models import Device
+        dev = Device.objects.first()
+        return dev.mac_address if dev else "default"
+    except Exception:
+        return "default"
 
-# Tracks the last time Django changed the motor mode (epoch seconds).
-# Used to apply a grace period in the MQTT callback so that stale
-# ESP32 packets don't immediately revert a mode change.
-MOTOR_MODE_CHANGE_TIME = {"timestamp": 0}
+def get_device_state(mac_address=None):
+    """Retrieve or initialize the state for a specific device MAC address.
+    If no MAC is provided, falls back to the first device in the database.
+    """
+    if not mac_address:
+        mac_address = get_default_mac()
 
-# Ring buffer for real-time charting.
-# Keeps the most recent 720 entries (~1 hour at one entry every 5 seconds).
-HISTORY_BUFFER = deque(maxlen=720)
+    if mac_address not in DEVICES_STATE:
+        DEVICES_STATE[mac_address] = {
+            "LATEST_INPUT": {},
+            "LATEST_SENSOR": {},
+            "LATEST_CALCULATED": {},
+            "MOTOR_STATE": {
+                "MOTOR_MODE": 0,           # 0 = AUTO, 1 = MANUAL
+                "MOTOR_MANUAL_STATUS": 0,  # valid only in MANUAL
+            },
+            "MOTOR_MODE_CHANGE_TIME": {"timestamp": 0},
+            "HISTORY_BUFFER": deque(maxlen=720)
+        }
+    return DEVICES_STATE[mac_address]
